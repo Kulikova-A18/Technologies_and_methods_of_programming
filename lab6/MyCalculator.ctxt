@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.target=MyCalculator
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+comment2.params=x\ y
+comment2.target=double\ add(double,\ double)
+comment3.params=x\ y
+comment3.target=double\ subtract(double,\ double)
+comment4.params=x\ y
+comment4.target=double\ multiply(double,\ double)
+comment5.params=x\ y
+comment5.target=double\ divide(double,\ double)
+comment6.params=base\ exponent
+comment6.target=double\ power(double,\ double)
+comment7.params=argument\ base
+comment7.target=double\ logarithm(double,\ double)
+numComments=8
