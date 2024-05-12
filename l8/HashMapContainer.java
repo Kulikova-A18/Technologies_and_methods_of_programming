@@ -69,43 +69,6 @@ class BinarySearchTreeContainer {
     }
 }
 
-// Абстрактный класс Hash с методом getHash
-abstract class Hash {
-    public abstract String getHash(String data);
-}
-
-// Класс для хеширования данных с использованием MD5
-class MD5Hash extends Hash {
-
-    @Override
-    public String getHash(String data) {
-        return digestJavaHexString("MD5", data);
-    }
-
-    private String digestJavaHexString(String algorithm, String message) {
-        StringBuffer sb = new StringBuffer();
-        try {
-            MessageDigest md = MessageDigest.getInstance(algorithm);
-            md.update(message.getBytes());
-            byte[] digest = md.digest();
-            for (byte b : digest) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-}
-
-// Класс, использующий шаблонный метод и стратегию для получения хешей
-class HashGenerator {
-    public String getHash(String data, Hash hash) {
-        // System.out.println(hash);
-        return hash.getHash(data);
-    }
-}
-
 // Контейнер на основе хэш-таблицы
 public class HashMapContainer {
     private Map<Integer, String> map;
@@ -115,13 +78,7 @@ public class HashMapContainer {
     }
 
     public void put(int key, String value) {
-        // Использование MD5 для хеширования
-        HashGenerator generator = new HashGenerator();
-        Hash md5Hash = new MD5Hash();
-        String md5Result = generator.getHash(value, md5Hash);
-
-        map.put(key, md5Result);
-
+        map.put(key, value);
     }
 
     public String get(int key) {
@@ -164,6 +121,7 @@ class Main {
     }
 
     private static void testAdditionAndSearch(Object container, String containerType) {
+
         MyTimer timer = new MyTimer();
         XYSeries addSeries = new XYSeries("Время добавления");
         XYSeries searchSeries = new XYSeries("Время поиска");
@@ -176,6 +134,9 @@ class Main {
                 } else if (container instanceof HashMapContainer) {
                     ((HashMapContainer) container).put(j, "значение" + j);
 
+                } else {
+                    System.out.println("Неподдерживаемый тип контейнера");
+                    return;
                 }
 
             }
@@ -186,8 +147,9 @@ class Main {
             // System.out.println("addTime: " + addTime + " ms");
 
             timer.start();
-            for (int j = 0; j < 10000; j++) {
+            for (int j = 0; j < 100000; j++) {
                 int keyToSearch = j % i;
+
                 if (container instanceof BinarySearchTreeContainer) {
                     ((BinarySearchTreeContainer) container).search(keyToSearch);
                 } else if (container instanceof HashMapContainer) {
@@ -200,7 +162,6 @@ class Main {
 
         createChart(addSeries, "Время добавления для " + containerType);
         createChart(searchSeries, "Время поиска для " + containerType);
-
     }
 
     private static void createChart(XYSeries series, String title) {
@@ -227,5 +188,6 @@ class Main {
 
         HashMapContainer hashMapContainer = new HashMapContainer();
         testAdditionAndSearch(hashMapContainer, "HashMapContainer");
+
     }
 }
