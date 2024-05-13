@@ -1,8 +1,7 @@
 import java.awt.BorderLayout;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+
+// import java.util.HashMap;
+// import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -14,85 +13,10 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-// Контейнер на основе двоичного дерева поиска
-class BinarySearchTreeContainer {
-    private Node root;
+import java.util.TreeSet;
+import java.util.HashSet;
 
-    private class Node {
-        int key;
-        Node left, right;
-
-        public Node(int key) {
-            this.key = key;
-            left = null;
-            right = null;
-        }
-    }
-
-    public BinarySearchTreeContainer() {
-        root = null;
-    }
-
-    public void insert(int key) {
-        root = insertRec(root, key);
-    }
-
-    private Node insertRec(Node root, int key) {
-        if (root == null) {
-            root = new Node(key);
-            return root;
-        }
-        if (key < root.key) {
-            root.left = insertRec(root.left, key);
-        } else if (key > root.key) {
-            root.right = insertRec(root.right, key);
-        }
-        return root;
-    }
-
-    public boolean search(int key) {
-        return searchRec(root, key);
-    }
-
-    private boolean searchRec(Node root, int key) {
-        if (root == null) {
-            return false;
-        }
-        if (root.key == key) {
-            return true;
-        }
-        if (key < root.key) {
-            return searchRec(root.left, key);
-        } else {
-            return searchRec(root.right, key);
-        }
-    }
-}
-
-// Контейнер на основе хэш-таблицы
-public class HashMapContainer {
-    private Map<Integer, String> map;
-
-    public HashMapContainer() {
-        map = new HashMap<>();
-    }
-
-    public void put(int key, String value) {
-        map.put(key, value);
-    }
-
-    public String get(int key) {
-        return map.get(key);
-    }
-
-    public void printAllEntries() {
-        // System.out.println("All entries in the HashMap:");
-        for (Map.Entry<Integer, String> entry : map.entrySet()) {
-            System.out.println(
-                    "Ключ: " + entry.getKey() + ", код хэша: " + entry.getValue());
-        }
-    }
-}
+import java.util.Random;
 
 class Main {
     public static class MyTimer {
@@ -121,39 +45,33 @@ class Main {
     }
 
     private static void testAdditionAndSearch(Object container, String containerType) {
-
         MyTimer timer = new MyTimer();
         XYSeries addSeries = new XYSeries("Время добавления");
         XYSeries searchSeries = new XYSeries("Время поиска");
 
-        for (int i = 1000; i <= 10000; i += 2000) {
+        Random random = new Random();
+
+        for (int i = 100; i <= 10000; i += 100) {
             timer.start();
             for (int j = 0; j < i; j++) {
-                if (container instanceof BinarySearchTreeContainer) {
-                    ((BinarySearchTreeContainer) container).insert(j);
-                } else if (container instanceof HashMapContainer) {
-                    ((HashMapContainer) container).put(j, "значение" + j);
-
-                } else {
-                    System.out.println("Неподдерживаемый тип контейнера");
-                    return;
+                int randomValue = random.nextInt(); // Генерация случайного числа
+                if (container instanceof TreeSet) {
+                    ((TreeSet<Integer>) container).add(randomValue);
+                } else if (container instanceof HashSet) {
+                    ((HashSet<Integer>) container).add(randomValue);
                 }
-
             }
 
             long addTime = timer.stop();
             addSeries.add(i, addTime);
 
-            // System.out.println("addTime: " + addTime + " ms");
-
             timer.start();
-            for (int j = 0; j < 100000; j++) {
-                int keyToSearch = j % i;
-
-                if (container instanceof BinarySearchTreeContainer) {
-                    ((BinarySearchTreeContainer) container).search(keyToSearch);
-                } else if (container instanceof HashMapContainer) {
-                    ((HashMapContainer) container).get(keyToSearch);
+            for (int j = 0; j < 10000; j++) {
+                int keyToSearch = random.nextInt(i); // Генерация случайного ключа для поиска
+                if (container instanceof TreeSet) {
+                    ((TreeSet<Integer>) container).contains(keyToSearch);
+                } else if (container instanceof HashSet) {
+                    ((HashSet<Integer>) container).contains(keyToSearch);
                 }
             }
             long searchTime = timer.stop();
@@ -183,11 +101,11 @@ class Main {
     }
 
     public static void main(String[] args) {
-        BinarySearchTreeContainer bstContainer = new BinarySearchTreeContainer();
-        testAdditionAndSearch(bstContainer, "BinarySearchTreeContainer");
+        TreeSet<Integer> treeSet = new TreeSet<>();
+        HashSet<Integer> hashSet = new HashSet<>();
 
-        HashMapContainer hashMapContainer = new HashMapContainer();
-        testAdditionAndSearch(hashMapContainer, "HashMapContainer");
+        testAdditionAndSearch(treeSet, "TreeSet");
+        testAdditionAndSearch(hashSet, "HashSet");
 
     }
 }
